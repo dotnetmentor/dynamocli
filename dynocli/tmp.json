@@ -1,0 +1,173 @@
+{
+  "Table": {
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "pk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "sk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi1pk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi2pk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi2sk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi3pk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi3sk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi4pk",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "gsi4sk",
+        "AttributeType": "S"
+      }
+    ],
+    "TableName": "dynamodbStackTable",
+    "KeySchema": [
+      {
+        "AttributeName": "pk",
+        "KeyType": "HASH"
+      },
+      {
+        "AttributeName": "sk",
+        "KeyType": "RANGE"
+      }
+    ],
+    "TableStatus": "ACTIVE",
+    "NumberOfDecreasesToday": 0,
+    "ReadCapacityUnits": 5,
+    "WriteCapacityUnits": 5
+  },
+  "TableSizeBytes": 864377323,
+  "ItemCount": 148213,
+  "TableArn": "arn:aws:dynamodb:ddblocal: 000000000000:table/dynamodbStackTable",
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "gsi1",
+      "KeySchema": [
+        {
+          "AttributeName": "gsi1pk",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "IndexStatus": "ACTIVE",
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      },
+      "IndexSizeBytes": 1933738,
+      "ItemCount": 4250,
+      "IndexArn": "arn:aws:dynamodb:ddblocal: 000000000000:table/dynamodbStackTable/index/gsi1"
+    },
+    {
+      "IndexName": "gsi2",
+      "KeySchema": [
+        {
+          "AttributeName": "gsi2pk",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "gsi2sk",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "IndexStatus": "ACTIVE",
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      },
+      "IndexSizeBytes": 72194382,
+      "ItemCount": 51601,
+      "IndexArn": "arn:aws:dynamodb:ddblocal: 000000000000:table/dynamodbStackTable/index/gsi2"
+    },
+    {
+      "IndexName": "gsi3",
+      "KeySchema": [
+        {
+          "AttributeName": "gsi3pk",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "gsi3sk",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "IndexStatus": "ACTIVE",
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      },
+      "IndexSizeBytes": 57240685,
+      "ItemCount": 39467,
+      "IndexArn": "arn:aws:dynamodb:ddblocal: 000000000000:table/dynamodbStackTable/index/gsi3"
+    },
+    {
+      "IndexName": "gsi4",
+      "KeySchema": [
+        {
+          "AttributeName": "gsi4pk",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "gsi4sk",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "IndexStatus": "ACTIVE",
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      },
+      "IndexSizeBytes": 58627,
+      "ItemCount": 41,
+      "IndexArn": "arn:aws:dynamodb:ddblocal: 000000000000:table/dynamodbStackTable/index/gsi4"
+    }
+  ],
+  "StreamSpecification": {
+    "StreamEnabled": "True",
+    "StreamViewType": "NEW_AND_OLD_IMAGES"
+  },
+  "LatestStreamLabel": "2022-12-29T08: 53: 11.957",
+  "LatestStreamArn": "arn:aws:dynamodb:ddblocal: 000000000000:table/dynamodbStackTable/stream/2022-12-29T08: 53: 11.957",
+  "ResponseMetadata": {
+    "RequestId": "e4bbc105-5a5c-4556-9411-83bf7bb5a003",
+    "HTTPStatusCode": 200,
+    "HTTPHeaders": {
+      "date": "Fri,20 Jan 2023 14: 04: 30 GMT",
+      "content-type": "application/x-amz-json-1.0",
+      "x-amz-crc32": "3280805914",
+      "x-amzn-requestid": "e4bbc105-5a5c-4556-9411-83bf7bb5a003",
+      "content-length": "2685",
+      "server": "Jetty(9.4.48.v20220622)"
+    },
+    "RetryAttempts": 0
+  }
+}
