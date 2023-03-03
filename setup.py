@@ -13,7 +13,8 @@ setup(
     long_description=long_description,
     install_requires=[
         'boto3',
-        'rich'
+        'rich',
+        'appdirs'
     ],
     python_requires=">=3.8",
     entry_points={
