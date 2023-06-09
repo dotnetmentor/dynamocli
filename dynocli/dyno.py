@@ -62,6 +62,10 @@ def read_update_values_from_input():
         done = not resp or not resp.lower().startswith('y')
     return updates
 
+def print_config(config: configparser.ConfigParser):
+    conn = config['Connection']
+    for key in conn:
+        print(f'{key}: {conn[key]}')
 
 def main():
     parser = argparse.ArgumentParser(
@@ -84,6 +88,7 @@ def main():
         if not os.path.isdir(config_dir_path):
             mkdir(path=config_dir_path)
         is_new = not os.path.isfile(config_file_path)
+        print(config_dir_path)
         if not is_new:
             config.read(config_file_path)
         config = update_configuration(config=config, is_new=is_new)
@@ -94,11 +99,11 @@ def main():
         raise Exception(
             'No configuration file found. Use --set-config to create one')
     config.read(config_file_path)
-    dynamo_gateway = DynamoGateway(config, args.verbose)
     if (args.op == 'get-config'):
         config.read(config_file_path)
-        print(dict(config))
-    elif args.op == 'describe':
+        print_config(config)
+    dynamo_gateway = DynamoGateway(config, args.verbose)
+    if args.op == 'describe':
         dynamo_gateway.describe_table()
     elif (args.op == 'query'):
         index = args.index

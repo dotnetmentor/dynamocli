@@ -141,10 +141,10 @@ class DynamoGateway:
         opr = kwargs.get('opr')
         val = kwargs.get('value')
         items = []
-        obj = Key(key)
-        m = getattr(obj, opr)
-        fe = m(val)
-        res = self.table.scan(FilterExpression=fe, Limit=100)
+        keyObject = Key(key)
+        conditionMethod = getattr(keyObject, opr)
+        filter_expression = conditionMethod(val)
+        res = self.table.scan(FilterExpression=filter_expression, Limit=100)
         items.extend(res.get('Items'))
 
         last_evaluated = res.get('LastEvaluatedKey')
@@ -153,13 +153,13 @@ class DynamoGateway:
         while not done and i < 100:
             print('scan iteration', i)
             iteration_res = self.table.scan(
-                FilterExpression=fe, Limit=100, ExclusiveStartKey=last_evaluated)
+                FilterExpression=filter_expression, Limit=100, ExclusiveStartKey=last_evaluated)
             items.extend(iteration_res.get('Items'))
             last_evaluated = iteration_res.get('LastEvaluatedKey')
             done = last_evaluated is None
             i += 1
 
-        print(items)
+        self.visualizer.print_items(items)
 
     def describe_table(self):
         description = self.client.describe_table(TableName=self.table_name)
