@@ -1,8 +1,9 @@
-from appdirs import user_config_dir
-import os.path
-from os import mkdir
 import argparse
-import configparser
+
+try: 
+    from .configuration import Configuration
+except:
+    from configuration import Configuration
 
 try:
     from .dynamo_gateway import DynamoGateway
@@ -10,35 +11,10 @@ except:
     from dynamo_gateway import DynamoGateway
 
 
-def update_configuration(config: configparser.ConfigParser, is_new=False):
-    if (is_new):
-        connection = {}
-        auth = input('Select authentication type [local, credentials, env] ')
-        if not auth in ['local', 'credentials', 'env']:
-            raise Exception(f'Invalid authentication type: {auth}')
-        connection['authentication'] = auth
-        if auth == 'local':
-            port = input(
-                'Select which port your local dynamoDB runs on. Default: 8000 ')
-            if not port:
-                port = '8000'
-            connection['port'] = port
-        elif auth == 'credentials':
-            profile = input(
-                'Enter profile name as set in your .credentials file ')
-            connection['profile'] = profile
-        if auth in ['env', 'credentials']:
-            region = input('Enter your AWS region ')
-            connection['region'] = region
-        table_name = input(
-            'Enter name of the table on which you wish to perform operations ')
-        connection['TableName'] = table_name
-        config['Connection'] = connection
-    else:
-        name = input('Enter parameter to add/update ')
-        value = input('Enter new value ')
-        config['Connection'][name] = value
-    return config
+def update_configuration(config: Configuration):
+      key = input('Enter parameter to add/update ')
+      value = input('Enter new value ')
+      config.set_value(key, value)
 
 
 def read_update_values_from_input():
@@ -62,11 +38,6 @@ def read_update_values_from_input():
         done = not resp or not resp.lower().startswith('y')
     return updates
 
-def print_config(config: configparser.ConfigParser):
-    conn = config['Connection']
-    for key in conn:
-        print(f'{key}: {conn[key]}')
-
 def main():
     parser = argparse.ArgumentParser(
         description="A simple command line tool to interact with a DynamoDB instance."
@@ -78,30 +49,18 @@ def main():
     parser.add_argument(
         '--index', '-i', help='Specify name of index to use. Omit "pk"', default='')
     parser.add_argument(
-        '--pk', help='The partition key value of the index to query')
-    parser.add_argument('--sk', help='The sort key value. Defaults to --pk')
+        '--pk', help='The partition key value of the index to query against.')
+    parser.add_argument('--sk', help='The sort key value.')
     args = parser.parse_args()
-    config = configparser.ConfigParser()
-    config_dir_path = user_config_dir('dynocli')
-    config_file_path = os.path.join(config_dir_path, '.config.ini')
+    conf = Configuration()
     if args.op == 'set-config':
-        if not os.path.isdir(config_dir_path):
-            mkdir(path=config_dir_path)
-        is_new = not os.path.isfile(config_file_path)
-        print(config_dir_path)
-        if not is_new:
-            config.read(config_file_path)
-        config = update_configuration(config=config, is_new=is_new)
-        with open(config_file_path, 'w') as config_file:
-            config.write(config_file)
+        update_configuration(conf)
+        conf.save_config()
         return
-    if not os.path.isfile(config_file_path):
-        raise Exception(
-            'No configuration file found. Use --set-config to create one')
-    config.read(config_file_path)
     if (args.op == 'get-config'):
-        config.read(config_file_path)
-        print_config(config)
+        conf.print_config()
+        return
+    config = conf.export()
     dynamo_gateway = DynamoGateway(config, args.verbose)
     if args.op == 'describe':
         dynamo_gateway.describe_table()

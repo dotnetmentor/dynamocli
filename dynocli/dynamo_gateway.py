@@ -12,27 +12,26 @@ except:
 
 
 class DynamoGateway:
-    def __init__(self, config_parser: configparser.ConfigParser, verbose=False) -> None:
+    def __init__(self, config: dict, verbose=False) -> None:
         log_level = 'DEBUG' if verbose else 'INFO'
         self.logger = getLogger(__name__)
         self.logger.setLevel(log_level)
-        config = config_parser['Connection']
         authentication_type = config.get(
             'authentication', 'local')
-        self.table_name = config.get('TableName')
+        self.table_name = config.get('tablename')
         if authentication_type == 'local':
-            port = config.get('PORT', '8000')
+            port = config.get('port', '8000')
             self.client = boto3.client(
-                'dynamodb', endpoint_url=f'http://localhost:{port}')
+                'dynamodb', endpoint_url=f'http://localhost:{port}', region_name=config.get('region'))
             self.table = boto3.resource(
-                'dynamodb', endpoint_url=f'http://localhost:{port}').Table(self.table_name)
+                'dynamodb', endpoint_url=f'http://localhost:{port}', region_name=config.get('region')).Table(self.table_name)
         elif (authentication_type == 'credentials'):
             session = boto3.Session(
-                profile_name=config.get('Profile', ''), region_name=config.get('Region'))
+                profile_name=config.get('profile', 'default'), region_name=config.get('region'))
             self.client = session.client('dynamodb')
             self.table = session.resource('dynamodb').Table(self.table_name)
         elif (authentication_type == 'env'):
-            session = boto3.Session(region_name=config.get('Region'))
+            session = boto3.Session(region_name=config.get('region'))
             self.client = session.client('dynamodb')
             self.table = session.resource('dynamodb').Table(self.table_name)
         else:
