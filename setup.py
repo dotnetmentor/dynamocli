@@ -7,7 +7,7 @@ setup(
     name='dynamocli',
     author='Viktor Blidh',
     author_email='viktor.blidh@gmail.com',
-    version='0.0.9',
+    version='0.0.10',
     description='Command line interface for interacting with a DynamoDB instance',
     long_description_content_type="text/markdown",
     long_description=long_description,
