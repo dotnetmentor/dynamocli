@@ -10,6 +10,8 @@ appdirs = "*"
 
 [dev-packages]
 autopep8 = "*"
+pytest = "*"
+moto = {extras = ["dynamodb"], version = "*"}
 
 [requires]
 python_version = "3.8"

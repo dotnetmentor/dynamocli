@@ -1,14 +1,8 @@
 import argparse
 
-try: 
-    from .configuration import Configuration
-except:
-    from configuration import Configuration
-
-try:
-    from .dynamo_gateway import DynamoGateway
-except:
-    from dynamo_gateway import DynamoGateway
+from src.dynamo_gateway import DynamoGateway
+from src.configuration import Configuration
+from src.resources import get_resources_from_config
 
 
 def update_configuration(config: Configuration):
@@ -61,9 +55,11 @@ def main():
         conf.print_config()
         return
     config = conf.export()
-    dynamo_gateway = DynamoGateway(config, args.verbose)
+    client, table, visualizer = get_resources_from_config(config)
+    dynamo_gateway = DynamoGateway(client, table, visualizer, args.verbose)
     if args.op == 'describe':
-        dynamo_gateway.describe_table()
+        description = dynamo_gateway.describe_table()
+        print(description)
     elif (args.op == 'query'):
         index = args.index
         pk = args.pk

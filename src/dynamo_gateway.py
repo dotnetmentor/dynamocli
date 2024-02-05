@@ -1,45 +1,19 @@
 from logging import getLogger
-import boto3
-from boto3.dynamodb.conditions import Key
-import configparser
+
+from boto3.dynamodb.conditions import Key, ConditionExpressionBuilder
+
 import itertools
 from operator import itemgetter
 
-try:
-    from .document_visualizer import DocumentVisualizer
-except:
-    from document_visualizer import DocumentVisualizer
-
 
 class DynamoGateway:
-    def __init__(self, config: dict, verbose=False) -> None:
+    def __init__(self, client, table, visualizer, verbose=False) -> None:
         log_level = 'DEBUG' if verbose else 'INFO'
         self.logger = getLogger(__name__)
         self.logger.setLevel(log_level)
-        authentication_type = config.get(
-            'authentication', 'local')
-        self.table_name = config.get('tablename')
-        if authentication_type == 'local':
-            port = config.get('port', '8000')
-            self.client = boto3.client(
-                'dynamodb', endpoint_url=f'http://localhost:{port}', region_name=config.get('region'))
-            self.table = boto3.resource(
-                'dynamodb', endpoint_url=f'http://localhost:{port}', region_name=config.get('region')).Table(self.table_name)
-        elif (authentication_type == 'credentials'):
-            session = boto3.Session(
-                profile_name=config.get('profile', 'default'), region_name=config.get('region'))
-            self.client = session.client('dynamodb')
-            self.table = session.resource('dynamodb').Table(self.table_name)
-        elif (authentication_type == 'env'):
-            session = boto3.Session(region_name=config.get('region'))
-            self.client = session.client('dynamodb')
-            self.table = session.resource('dynamodb').Table(self.table_name)
-        else:
-            self.logger.error(
-                'No valid connection setting provided. Possible options are [local, env, credentials]')
-            self.client = None
-            self.table = None
-        self.visualizer = DocumentVisualizer()
+        self.table = table
+        self.client = client
+        self.visualizer = visualizer
 
     def delete_item(self, pk, sk):
         table = self.table
@@ -61,6 +35,9 @@ class DynamoGateway:
         else:
             self.logger.error(
                 "Something went wrong when attempting to delete item:\n {}".format(response))
+        
+        print('HELLO?')
+        print(response)
         return response
 
     def update_item(self, pk, sk, **kwargs):
@@ -80,6 +57,7 @@ class DynamoGateway:
         updates = kwargs.get('updates')
         grouped_updates = [list(g) for k, g in itertools.groupby(
             sorted(updates, key=get_attr), get_attr)]
+
         update_expression = ''
         attribute_values = {}
         for j, group in enumerate(grouped_updates):
@@ -110,26 +88,35 @@ class DynamoGateway:
         self.logger.debug(table_params)
         result = table.update_item(**table_params)
         self.logger.debug(result)
+        return result
 
     def query(self, index, value, sk, showResult=True):
-        table = self.table
-        if table is None:
+        if self.table is None:
             self.logger.error('No table is configured')
             raise Exception('No table was found, check your connection config')
         resp = {}
+        builder = ConditionExpressionBuilder()
+        index = index if index else ''
         if (sk):
-            key_expr = Key('{}pk'.format(index)).eq(
-                value) & Key('{}sk'.format(index)).begins_with(sk)
+            key_expr, attribute_names, attribute_values = builder.build_expression(
+                Key('{}pk'.format(index)).eq(value) & Key('{}sk'.format(index)).begins_with(sk), True)
         else:
-            key_expr = Key('{}pk'.format(index)).eq(value)
+            key_expr, attribute_names, attribute_values = builder.build_expression(
+                Key('{}pk'.format(index)).eq(value), True)
+
         if (index):
-            resp = table.query(
+            resp = self.table.query(
                 IndexName=index,
-                KeyConditionExpression=key_expr)
+                TableName=self.table.table_name,
+                KeyConditionExpression=key_expr,
+                ExpressionAttributeNames=attribute_names,
+                ExpressionAttributeValues=attribute_values)
         else:
-            resp = table.query(
-                KeyConditionExpression=Key('pk').eq(
-                    value) & Key('sk').begins_with(sk))
+            resp = self.table.query(
+                KeyConditionExpression=key_expr,
+                ExpressionAttributeNames=attribute_names,
+                ExpressionAttributeValues=attribute_values)
+
         items = resp.get('Items')
         if (showResult):
             self.visualizer.print_items(items=items)
@@ -161,6 +148,8 @@ class DynamoGateway:
         self.visualizer.print_items(items)
 
     def describe_table(self):
-        description = self.client.describe_table(TableName=self.table_name)
+        description = self.client.describe_table(
+            TableName=self.table.table_name)
         self.logger.debug(description)
-        print(description)
+        
+        return description
