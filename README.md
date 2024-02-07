@@ -1,5 +1,5 @@
 # DynamoDB CLI 
-![Workflow](https://github.com/dotnetmentor/dynamocli/actions/workflows/build-test-app.yml/badge.svg)
+![Workflow](https://github.com/dotnetmentor/dynamocli/actions/workflows/ci.yml/badge.svg)
 ![Coverage Badge](https://github.com/dotnetmentor/dynamocli/blob/main/coverage.svg)
 
 
