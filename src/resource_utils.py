@@ -1,4 +1,5 @@
 import boto3
+from rich.console import Console
 
 from src.document_visualizer import DocumentVisualizer
 
@@ -22,6 +23,9 @@ def get_resources_from_config(config: dict):
         table = session.resource('dynamodb').Table(table_name)
     else:
         client = None
-        table = None
-    visualizer = DocumentVisualizer()
-    return client, table, visualizer
+        table = None    
+    return client, table, 
+
+def get_visualizer():
+    console = Console()
+    return DocumentVisualizer(console=console)

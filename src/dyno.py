@@ -2,7 +2,7 @@ import argparse
 
 from src.dynamo_gateway import DynamoGateway
 from src.configuration import Configuration
-from src.resources import get_resources_from_config
+from resource_utils import get_resources_from_config, get_visualizer
 
 
 def update_configuration(config: Configuration):
@@ -55,10 +55,11 @@ def main():
         conf.print_config()
         return
     config = conf.export()
-    client, table, visualizer = get_resources_from_config(config)
+    client, table = get_resources_from_config(config)
+    visualizer = get_visualizer()
     dynamo_gateway = DynamoGateway(client, table, visualizer, args.verbose)
     if args.op == 'describe':
-        description = dynamo_gateway.describe_table()
+        description = dynamo_gateway.get_table_description()
         print(description)
     elif (args.op == 'query'):
         index = args.index
@@ -92,7 +93,7 @@ def main():
                     valid_index = False
                     while (not valid_index):
                         i = int(
-                            input('Select which item to delete (0-{}) '.format(len(items)-1)))
+                            input('Select which item to update (0-{}) '.format(len(items)-1)))
                         if (i < len(items)):
                             valid_index = True
                         else:
