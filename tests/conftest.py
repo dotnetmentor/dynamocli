@@ -1,5 +1,6 @@
 from moto import mock_aws
 import pytest
+from unittest.mock import Mock
 import os
 import boto3
 
@@ -18,7 +19,8 @@ def aws_credentials():
 
 @pytest.fixture(scope='function')
 def visualizer():
-    yield DocumentVisualizer()
+    mock_visualizer = Mock(spec=DocumentVisualizer)
+    yield mock_visualizer
 
 
 @pytest.fixture(scope='function')

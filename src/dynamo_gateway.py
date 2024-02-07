@@ -5,9 +5,11 @@ from boto3.dynamodb.conditions import Key, ConditionExpressionBuilder
 import itertools
 from operator import itemgetter
 
+from src.document_visualizer import DocumentVisualizer
+
 
 class DynamoGateway:
-    def __init__(self, client, table, visualizer, verbose=False) -> None:
+    def __init__(self, client, table, visualizer: DocumentVisualizer, verbose=False) -> None:
         log_level = 'DEBUG' if verbose else 'INFO'
         self.logger = getLogger(__name__)
         self.logger.setLevel(log_level)
@@ -19,10 +21,10 @@ class DynamoGateway:
         table = self.table
         if table is None:
             self.logger.error('No table is configured')
-            return
+            raise ValueError('No table was found, check your connection config')
         if (pk is None or sk is None):
-            raise Exception(
-                'You need to supply both pk and sk. Got {}, {}', pk, sk)
+            raise ValueError(
+                f'You need to supply both pk and sk. Got {pk}, {sk}')
         response = table.delete_item(
             Key={
                 'pk': pk,
@@ -32,19 +34,13 @@ class DynamoGateway:
         )
         if (response.get('ResponseMetadata').get('HTTPStatusCode') == 200):
             self.logger.info("Successfully deleted item")
-        else:
-            self.logger.error(
-                "Something went wrong when attempting to delete item:\n {}".format(response))
-        
-        print('HELLO?')
-        print(response)
         return response
 
     def update_item(self, pk, sk, **kwargs):
         table = self.table
         if table is None:
             self.logger.error('No table is configured')
-            return
+            raise ValueError('No table was found, check your connection config')
         upsert = kwargs.get('upsert', False)
         table_params = {
             'Key': {
@@ -93,7 +89,7 @@ class DynamoGateway:
     def query(self, index, value, sk, showResult=True):
         if self.table is None:
             self.logger.error('No table is configured')
-            raise Exception('No table was found, check your connection config')
+            raise ValueError('No table was found, check your connection config')
         resp = {}
         builder = ConditionExpressionBuilder()
         index = index if index else ''
@@ -135,19 +131,19 @@ class DynamoGateway:
 
         last_evaluated = res.get('LastEvaluatedKey')
         done = last_evaluated is None
-        i = 1
+        i = 0
         while not done and i < 100:
-            print('scan iteration', i)
-            iteration_res = self.table.scan(
+            iteration_result = self.table.scan(
                 FilterExpression=filter_expression, Limit=100, ExclusiveStartKey=last_evaluated)
-            items.extend(iteration_res.get('Items'))
-            last_evaluated = iteration_res.get('LastEvaluatedKey')
+            items.extend(iteration_result.get('Items'))
+            last_evaluated = iteration_result.get('LastEvaluatedKey')
             done = last_evaluated is None
             i += 1
 
         self.visualizer.print_items(items)
+        return items
 
-    def describe_table(self):
+    def get_table_description(self):
         description = self.client.describe_table(
             TableName=self.table.table_name)
         self.logger.debug(description)

@@ -3,8 +3,8 @@ from rich.console import Console
 
 
 class DocumentVisualizer:
-    def __init__(self) -> None:
-        self.console = Console()
+    def __init__(self, console: Console) -> None:
+        self.console = console
         self.colors = ["turquoise2",
                        "green1",
                        "spring_green2",
