@@ -1,7 +1,6 @@
-![Coverage Badge](https://github.com/dotnetmentor/dynamocli/blob/main/coverage.svg)
-![Coverage Badge](https://raw.githubusercontent.com/dotnetmentor/dynamocli/gh-pages/coverage.svg)
-![Workflow](https://github.com/dotnetmentor/dynamocli/actions/workflows/build-test-app.yml/badge.svg)
 # DynamoDB CLI 
+![Workflow](https://github.com/dotnetmentor/dynamocli/actions/workflows/build-test-app.yml/badge.svg)
+![Coverage Badge](https://github.com/dotnetmentor/dynamocli/blob/main/coverage.svg)
 
 
 ## Introduction
