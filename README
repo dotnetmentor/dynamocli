@@ -1,4 +1,7 @@
 # DynamoDB CLI 
+![Coverage Badge](https://github.com/dotnetmentor/dynamocli/blob/main/coverage.svg)
+![Coverage Badge](https://raw.githubusercontent.com/vblidh/dynamocli/gh-pages/coverage.svg)
+
 
 ## Introduction
 A simple lightweight command line interface for interacting with an Amazon DynamoDB instance. 
